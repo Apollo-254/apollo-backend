@@ -1,0 +1,43 @@
+version:  '3.8'
+services:
+  web:
+    container_name: apollo-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/usr/src/app/
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env
+    depends_on:
+      - apollo-db
+    links:
+      - apollo-db:apollo-db
+    networks:
+      - freecodecamp
+
+  apollo-db:
+    image: postgres:13
+    container_name: apollo_db
+    restart: always
+    volumes:
+      - database-data:/var/lib/mysql/data/
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: apollo_db
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    networks:
+      - freecodecamp
+volumes:
+  database-data:
+networks:
+  freecodecamp:
+
+
