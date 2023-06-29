@@ -13,13 +13,13 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - apollo-db
+      - db
     links:
-      - apollo-db:apollo-db
+      - db:db
     networks:
       - freecodecamp
 
-  apollo-db:
+  db:
     image: postgres:13
     container_name: apollo_db
     restart: always
