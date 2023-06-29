@@ -1,6 +1,8 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
 
+from hospitals.models import Hospital
+
 AUTH_PROVIDERS = {
     'email': 'email', 'google': 'google', 'twitter': 'twitter', 'facebook': 'facebook'
 }
@@ -43,8 +45,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     username = None
-    firstname = models.CharField(max_length=30, null=True, blank=True)
-    lastname = models.CharField(max_length=30, null=True, blank=True)
+    name = models.CharField(max_length=30, null=True, blank=True)
     phone = models.CharField(max_length=30, null=True, blank=True, verbose_name='Mobile number', unique=True)
     age = models.IntegerField(default=0)
     gender = models.CharField(default="Male", max_length=6)
@@ -54,12 +55,13 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
 
     is_admin = models.BooleanField(default=False)
+    is_doctor = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     auth_provider = models.CharField(max_length=255, blank=True, null=True, default=AUTH_PROVIDERS.get('email'))
 
     USERNAME_FIELD = 'phone'
-    REQUIRED_FIELDS = ['lastname', 'age', 'gender']
+    REQUIRED_FIELDS = ['name', 'age', 'gender']
 
     objects = UserManager()
 
@@ -73,3 +75,8 @@ class User(AbstractBaseUser):
     # does this user have permissions to view the app
     def has_module_perms(self, app_label):
         return True
+
+
+class Doctor(models.Model):
+    doctor = models.ForeignKey(User, related_name='doctor', on_delete=models.CASCADE)
+    hospital = models.ForeignKey(Hospital, related_name='hospital', on_delete=models.CASCADE)

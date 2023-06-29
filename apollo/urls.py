@@ -7,6 +7,8 @@ from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView, Sp
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/v1/', include('auth_apps.urls'), name="auth"),
+    path('v1/', include('users.urls'), name="users"),
+    path('v1/', include('hospitals.urls'), name="hospitals"),
 
     # documentation urls
     path('', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-schema'),

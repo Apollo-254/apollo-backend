@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer, TokenObtainPairSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'firstname', 'lastname', 'phone', 'age', 'password', 'confirm_psd']
+        fields = ['id', 'name', 'phone', 'age','is_doctor', 'gender', 'password', 'confirm_psd']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -30,13 +30,18 @@ class UserSerializer(serializers.ModelSerializer, TokenObtainPairSerializer):
             attrs.pop('confirm_psd')
             if password != password2:
                 raise exceptions.AuthenticationFailed('Passwords must match.', "password_mismatch", )
-            User.objects.create_user(
+            user = User.objects.create_user(
                 **attrs
             )
-            # user.set_password(password)
-            # user.save()
+
             token = super().validate(attrs)
+            details = {
+                "phone": user.phone,
+                "name": user.name,
+                "gender": user.gender
+            }
             data = {
+                "details": details,
                 "token": token,
                 "expires_in": settings.SIMPLE_JWT.get('ACCESS_TOKEN_LIFETIME')
             }
