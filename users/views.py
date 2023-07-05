@@ -1,4 +1,4 @@
-from django.shortcuts import render
+
 
 # Create your views here.
 from rest_framework.pagination import PageNumberPagination
@@ -15,5 +15,8 @@ class UsersView(ModelViewSet):
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
 
-    search_fields = ('^name', '^phone', )
+    search_fields = ('^name', '^phone',)
     ordering_fields = ['phone']
+
+
+

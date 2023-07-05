@@ -2,16 +2,24 @@ from django.conf import settings
 from rest_framework import serializers, exceptions, status
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from users.models import User
+from users.models import User, Doctor
 from utils.messages.hundle_messages import successResponse
+from utils.messages.response_SMS import SendSms
+
+
+class DoctorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doctor
+        fields = '__all__'
 
 
 class UserSerializer(serializers.ModelSerializer, TokenObtainPairSerializer):
+    # doctor = DoctorSerializer(many=True)
     confirm_psd = serializers.CharField(write_only=True, style={input: 'password'}, )
 
     class Meta:
         model = User
-        fields = ['id', 'name', 'phone', 'age','is_doctor', 'gender', 'password', 'confirm_psd']
+        fields = ['id', 'name', 'phone', 'age', 'is_doctor', 'gender', 'password', 'confirm_psd']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -30,11 +38,13 @@ class UserSerializer(serializers.ModelSerializer, TokenObtainPairSerializer):
             attrs.pop('confirm_psd')
             if password != password2:
                 raise exceptions.AuthenticationFailed('Passwords must match.', "password_mismatch", )
+
             user = User.objects.create_user(
                 **attrs
             )
 
             token = super().validate(attrs)
+            SendSms("thank you for joining us", user.phone)
             details = {
                 "phone": user.phone,
                 "name": user.name,
